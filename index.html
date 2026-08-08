@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Paraná Configurator V2.2.0</title>
+  <title>Paraná Configurator V2.2.1</title>
   <style>:root{
   --ink:#0a0a0a;
   --muted:#777;
@@ -163,7 +163,7 @@ button:disabled{cursor:not-allowed;opacity:.35}
   border:1px solid var(--ink);
   backdrop-filter:blur(5px);
 }
-.viewport-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.viewport-tabs{display:grid;grid-template-columns:1fr;gap:6px}
 .viewport-tabs .btn{width:100%;font-size:12px;padding:10px 12px}
 .viewport-price{display:grid;grid-template-columns:1fr 1.18fr;border-top:1px solid var(--line)}
 .price-option{padding:10px 10px 4px 0;min-width:0}
@@ -313,10 +313,12 @@ button:disabled{cursor:not-allowed;opacity:.35}
 .mobile-context-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
 .mobile-context-grid .btn{min-height:42px;white-space:normal;}
 .mobile-empty{margin:0;color:var(--muted);line-height:1.45;font-size:14px;}
+.desktop-view-toggle{display:block;width:100%;margin-top:12px;}
 
 @media (max-width: 900px) {
   .app-shell{display:flex;}
   .configbar,.contextbar{display:none !important;}
+  .viewport-tabs{display:none;}
   .workspace{order:2;}
   .mobile-toolbar{order:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px 12px 14px;background:#fff;border-top:1px solid var(--line);}
   .mobile-toolbar-btn{min-height:42px;font-size:11px;padding:10px 8px;}
@@ -330,6 +332,7 @@ button:disabled{cursor:not-allowed;opacity:.35}
   .view-controls{left:8px;bottom:8px;max-width:unset;}
   .view-controls .btn{font-size:9px;padding:7px 8px;min-height:34px;}
   .commercial-summary{display:none;}
+  .desktop-view-toggle{display:none;}
 }
 
 @media (max-width: 640px) {
@@ -2859,6 +2862,7 @@ var AppController = class {
                 <div class="price-option discounted"><small>efectivo o transferencia . 25% OFF</small><strong id="cashPrice"></strong></div>
                 <div class="price-separator"></div>
                 <div class="price-option"><small>tarjeta . hasta 6 cuotas</small><strong id="listPrice"></strong></div>
+                <button class="btn desktop-view-toggle" id="toggleView">Ver en 3D</button>
               </div>
             </div>
           </section>
@@ -2890,6 +2894,10 @@ var AppController = class {
     get("undoBtn").onclick = () => this.undo();
     get("redoBtn").onclick = () => this.redo();
     get("saveBtn").onclick = () => this.save();
+    get("toggleView").onclick = () => {
+      this.ui.viewMode = this.ui.viewMode === "2d" ? "3d" : "2d";
+      this.renderEditor();
+    };
     get("resetBtn").onclick = () => {
       if (!window.confirm("\xBFRestablecer este proyecto?")) return;
       const next = this.project.quote.mode === "standard" ? standardProject() : createProject("Mueble a medida", { quote: { mode: "custom", discount: 0 } });
@@ -2904,6 +2912,11 @@ var AppController = class {
     const cashPrice = this.root.querySelector("#cashPrice");
     if (listPrice) listPrice.textContent = formatArs(quote.totalBeforeDiscount);
     if (cashPrice) cashPrice.textContent = formatArs(quote.totalBeforeDiscount * 0.75);
+    const toggleView = this.root.querySelector("#toggleView");
+    if (toggleView) {
+      toggleView.textContent = this.ui.viewMode === "3d" ? "Ver en 2D" : "Ver en 3D";
+      toggleView.classList.toggle("active", this.ui.viewMode === "3d");
+    }
     const undo = this.root.querySelector("#undoBtn");
     const redo = this.root.querySelector("#redoBtn");
     if (undo) {
