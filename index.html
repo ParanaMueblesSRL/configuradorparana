@@ -172,6 +172,8 @@ button:disabled{cursor:not-allowed;opacity:.35}
 .price-option strong{display:block;margin-top:4px;font-size:20px;letter-spacing:-.035em;white-space:nowrap}
 .price-option.discounted strong{font-size:23px}
 .price-option.discounted small{color:#333}
+.whatsapp-contact{display:block;width:100%;margin-top:10px;text-align:center;text-decoration:none;background:#111;color:#fff;border-color:#111}
+.whatsapp-contact:hover{background:#fff!important;color:#111!important}
 
 @media(max-width:1100px){
   .topbar{grid-template-columns:auto auto minmax(120px,1fr) auto}
@@ -2863,6 +2865,7 @@ var AppController = class {
                 <div class="price-separator"></div>
                 <div class="price-option"><small>tarjeta . hasta 6 cuotas</small><strong id="listPrice"></strong></div>
                 <button class="btn desktop-view-toggle" id="toggleView">Ver en 3D</button>
+                <a class="btn whatsapp-contact" id="whatsappBtn" target="_blank" rel="noopener noreferrer">Hablar por WhatsApp</a>
               </div>
             </div>
           </section>
@@ -2912,6 +2915,23 @@ var AppController = class {
     const cashPrice = this.root.querySelector("#cashPrice");
     if (listPrice) listPrice.textContent = formatArs(quote.totalBeforeDiscount);
     if (cashPrice) cashPrice.textContent = formatArs(quote.totalBeforeDiscount * 0.75);
+    const whatsappBtn = this.root.querySelector("#whatsappBtn");
+    if (whatsappBtn) {
+      const doors = this.project.modules.filter((module) => module.type === "door").length;
+      const backs = this.project.modules.filter((module) => module.type === "back").length;
+      const drawers = this.project.modules.filter((module) => module.type === "drawer").length;
+      const message = `Hola Paraná, quería consultar por este mueble:
+
+Medidas:
+ANCHO ${this.project.dimensions.width / 10} CM
+ALTO ${this.project.dimensions.height / 10} CM
+PROF ${this.project.dimensions.depth / 10} CM
++ ${doors} puertas · ${backs} fondos · ${drawers} cajoneras
+
+Con tarjeta hasta 6 cuotas sin interés ${formatArs(quote.totalBeforeDiscount)}
+En efectivo o transferencia 25% OFF ${formatArs(quote.totalBeforeDiscount * 0.75)}`;
+      whatsappBtn.href = `https://wa.me/5491135802073?text=${encodeURIComponent(message)}`;
+    }
     const toggleView = this.root.querySelector("#toggleView");
     if (toggleView) {
       toggleView.textContent = this.ui.viewMode === "3d" ? "Ver en 2D" : "Ver en 3D";
